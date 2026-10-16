@@ -14,6 +14,19 @@ export const createLead = async (req, res, next) => {
   }
 };
 
+export const createAdminLead = async (req, res, next) => {
+  try {
+    const result = await leadService.createAdminLead(req.body, req.user);
+    return sendCreated(
+      res,
+      result,
+      'Lead registrado en el sistema correctamente'
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getLead = async (req, res, next) => {
   try {
     const lead = await leadService.getLeadById(req.params.id);

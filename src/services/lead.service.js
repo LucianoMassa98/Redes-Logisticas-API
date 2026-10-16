@@ -96,6 +96,106 @@ export class LeadService {
     }
   }
 
+  async createAdminLead(inputData, currentUser) {
+    const {
+      fullName,
+      phone,
+      email,
+      address,
+      locality,
+      province,
+      customerType,
+      services,
+      latitude,
+      longitude,
+      locationReference,
+      description,
+      preferredContactMethod,
+      status = LEAD_STATUSES.NEW,
+      assignedUserId = null,
+      source = 'MANUAL_ADMIN',
+      initialNote = null,
+    } = inputData;
+
+    // Normalizar teléfono
+    const normalizedPhone = normalizePhoneNumber(phone);
+    if (!normalizedPhone || normalizedPhone.length < 8) {
+      throw Boom.badRequest('El número de teléfono proporcionado no es válido o está incompleto.');
+    }
+
+    // Resolver y validar servicios solicitados
+    const resolvedServices = await serviceRepository.resolveServices(services);
+    if (!resolvedServices || resolvedServices.length === 0) {
+      throw Boom.badRequest('Al menos uno de los servicios seleccionados no existe o no se encuentra disponible.');
+    }
+
+    const serviceIds = resolvedServices.map((s) => s.id);
+
+    const t = await sequelize.transaction();
+
+    try {
+      const leadData = {
+        fullName: fullName.trim(),
+        phone: normalizedPhone,
+        email: email ? email.trim().toLowerCase() : null,
+        address: address.trim(),
+        locality: locality.trim(),
+        province: province ? province.trim() : 'Argentina',
+        customerType,
+        latitude: latitude || null,
+        longitude: longitude || null,
+        locationReference: locationReference ? locationReference.trim() : null,
+        description: description ? description.trim() : null,
+        preferredContactMethod: preferredContactMethod || 'WHATSAPP',
+        status,
+        assignedUserId: assignedUserId || null,
+        source: source.trim() || 'MANUAL_ADMIN',
+        privacyPolicyVersion: '1.0',
+        privacyAcceptedAt: new Date(),
+      };
+
+      const createdLead = await leadRepository.createWithServices(leadData, serviceIds, t);
+
+      // Registrar actividad de creación manual por parte del operador
+      const serviceNames = resolvedServices.map((s) => s.name).join(', ');
+      await activityRepository.create(
+        {
+          leadId: createdLead.id,
+          userId: currentUser?.id || null,
+          activityType: ACTIVITY_TYPES.LEAD_CREATED,
+          description: `Lead registrado manualmente por ${currentUser?.fullName || 'Administración'} con los servicios: ${serviceNames}.`,
+          metadata: {
+            customerType,
+            locality: leadData.locality,
+            source: leadData.source,
+            initialStatus: status,
+            services: resolvedServices.map((s) => ({ id: s.id, code: s.code, name: s.name })),
+          },
+        },
+        t
+      );
+
+      // Si se incluyó una nota interna inicial
+      if (initialNote && initialNote.trim()) {
+        await noteRepository.create(
+          {
+            leadId: createdLead.id,
+            userId: currentUser?.id || null,
+            content: initialNote.trim(),
+          },
+          t
+        );
+      }
+
+      await t.commit();
+
+      return this.getLeadById(createdLead.id);
+    } catch (error) {
+      await t.rollback();
+      throw error;
+    }
+  }
+
   async getLeadById(id) {
     const lead = await leadRepository.findById(id);
     if (!lead) {

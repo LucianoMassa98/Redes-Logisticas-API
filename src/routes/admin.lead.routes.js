@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   listLeads,
   getLead,
+  createAdminLead,
   updateLead,
   updateStatus,
   updateAssignment,
@@ -17,6 +18,7 @@ import { validateRequest } from '../middlewares/validate.middleware.js';
 import { uuidParamSchema } from '../validators/common.validator.js';
 import {
   listLeadsQuerySchema,
+  createAdminLeadSchema,
   updateLeadSchema,
   updateLeadStatusSchema,
   updateLeadAssignmentSchema,
@@ -29,6 +31,9 @@ const router = Router();
 
 // Todas las rutas requieren autenticación y rol ADMIN o COMMERCIAL
 router.use(requireAuth, requireRoles([USER_ROLES.ADMIN, USER_ROLES.COMMERCIAL]));
+
+// Creación manual de lead administrativo
+router.post('/leads', validateRequest(createAdminLeadSchema, 'body'), createAdminLead);
 
 // Listado paginado y filtros
 router.get('/leads', validateRequest(listLeadsQuerySchema, 'query'), listLeads);

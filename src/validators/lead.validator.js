@@ -53,6 +53,56 @@ export const createLeadSchema = Joi.object({
   // Rechazar campos no permitidos que un atacante pudiera enviar para autoasignarse estado o roles
   .unknown(false);
 
+export const createAdminLeadSchema = Joi.object({
+  fullName: Joi.string().trim().min(3).max(120).required().messages({
+    'string.empty': 'El nombre y apellido son obligatorios.',
+    'string.min': 'El nombre debe tener al menos 3 caracteres.',
+    'any.required': 'El nombre y apellido son obligatorios.',
+  }),
+  phone: Joi.string().trim().min(6).max(30).required().messages({
+    'string.empty': 'El teléfono de contacto es obligatorio.',
+    'any.required': 'El teléfono de contacto es obligatorio.',
+  }),
+  email: Joi.string().email().allow(null, '').optional().messages({
+    'string.email': 'El formato de correo electrónico no es válido.',
+  }),
+  address: Joi.string().trim().min(3).max(255).required().messages({
+    'string.empty': 'La dirección del servicio es obligatoria.',
+    'any.required': 'La dirección del servicio es obligatoria.',
+  }),
+  locality: Joi.string().trim().min(2).max(100).required().messages({
+    'string.empty': 'La localidad es obligatoria.',
+    'any.required': 'La localidad es obligatoria.',
+  }),
+  province: Joi.string().trim().max(100).allow(null, '').default('Argentina'),
+  customerType: Joi.string()
+    .valid(...Object.values(CUSTOMER_TYPES))
+    .required()
+    .messages({
+      'any.only': 'El tipo de cliente seleccionado no es válido.',
+      'any.required': 'Debe seleccionar un tipo de cliente.',
+    }),
+  services: Joi.array()
+    .items(Joi.string().required())
+    .min(1)
+    .required()
+    .messages({
+      'array.min': 'Debe seleccionar al menos un servicio de interés.',
+      'any.required': 'Los servicios de interés son obligatorios.',
+    }),
+  status: Joi.string()
+    .valid(...Object.values(LEAD_STATUSES))
+    .default(LEAD_STATUSES.NEW),
+  assignedUserId: Joi.string().uuid().allow(null, '').optional(),
+  source: Joi.string().trim().max(50).default('MANUAL_ADMIN'),
+  locationReference: Joi.string().trim().max(500).allow(null, '').optional(),
+  description: Joi.string().trim().max(2000).allow(null, '').optional(),
+  preferredContactMethod: Joi.string()
+    .valid(...Object.values(PREFERRED_CONTACT_METHODS))
+    .default(PREFERRED_CONTACT_METHODS.WHATSAPP),
+  initialNote: Joi.string().trim().max(2000).allow(null, '').optional(),
+});
+
 export const updateLeadSchema = Joi.object({
   fullName: Joi.string().trim().min(3).max(120).optional(),
   phone: Joi.string().trim().min(6).max(30).optional(),
