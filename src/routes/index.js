@@ -7,6 +7,7 @@ import adminLeadRoutes from './admin.lead.routes.js';
 import adminDashboardRoutes from './admin.dashboard.routes.js';
 import adminUserRoutes from './admin.user.routes.js';
 import adminQuoteRoutes from './admin.quote.routes.js';
+import adminInventoryRoutes from './admin.inventory.routes.js';
 
 const apiRouter = Router();
 
@@ -21,5 +22,6 @@ apiRouter.use('/admin', adminLeadRoutes);
 apiRouter.use('/admin', adminDashboardRoutes);
 apiRouter.use('/admin', adminUserRoutes);
 apiRouter.use('/admin', adminQuoteRoutes);
+apiRouter.use('/admin', adminInventoryRoutes);
 
 export default apiRouter;

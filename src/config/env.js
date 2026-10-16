@@ -27,6 +27,8 @@ const envSchema = Joi.object({
   ADMIN_INITIAL_EMAIL: Joi.string().email().default('admin@serviciostecnologicos.com'),
   ADMIN_INITIAL_PASSWORD: Joi.string().min(8).default('Admin123456!'),
 
+  INSTALLATION_MARKUP_PERCENT: Joi.number().min(0).default(100),
+
   RATE_LIMIT_WINDOW_MS: Joi.number().integer().default(15 * 60 * 1000),
   RATE_LIMIT_MAX_REQUESTS: Joi.number().integer().default(100),
   AUTH_RATE_LIMIT_MAX_REQUESTS: Joi.number().integer().default(10),
@@ -76,6 +78,7 @@ export const config = {
     email: envVars.ADMIN_INITIAL_EMAIL || 'admin@serviciostecnologicos.com',
     password: envVars.ADMIN_INITIAL_PASSWORD || 'Admin123456!',
   },
+  installationMarkupPercent: Number(envVars.INSTALLATION_MARKUP_PERCENT !== undefined ? envVars.INSTALLATION_MARKUP_PERCENT : 100),
   rateLimit: {
     windowMs: Number(envVars.RATE_LIMIT_WINDOW_MS || 900000),
     max: Number(envVars.RATE_LIMIT_MAX_REQUESTS || 100),
