@@ -30,8 +30,9 @@ app.use(
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Permitir solicitudes sin origin (como apps móviles, Postman o curl) o si está en la lista de permitidos
-      if (!origin || config.corsOrigins.includes(origin)) {
+      // Permitir solicitudes sin origin, autorizados por config o cualquier puerto de localhost en desarrollo
+      const isLocalDev = !config.isProduction && /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+      if (!origin || config.corsOrigins.includes(origin) || isLocalDev) {
         callback(null, true);
       } else {
         callback(new Error(`Origen ${origin} no permitido por las políticas CORS.`));
