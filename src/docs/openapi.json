@@ -1,0 +1,124 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "API Plataforma de Captación y Gestión de Leads - Servicios Tecnológicos",
+    "version": "1.0.0",
+    "description": "API REST profesional para captación de clientes de seguridad electrónica, internet Starlink y conectividad, con panel de administración y control comercial."
+  },
+  "servers": [
+    {
+      "url": "/api/v1",
+      "description": "API v1 Endpoint"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Verifica estado del servidor (Liveness)",
+        "responses": {
+          "200": { "description": "Servidor en línea" }
+        }
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "summary": "Verifica estado de la base de datos (Readiness)",
+        "responses": {
+          "200": { "description": "Base de datos conectada y operativa" },
+          "503": { "description": "Base de datos no disponible" }
+        }
+      }
+    },
+    "/services": {
+      "get": {
+        "summary": "Lista de servicios tecnológicos activos para el catálogo",
+        "responses": {
+          "200": { "description": "Catálogo de servicios disponibles" }
+        }
+      }
+    },
+    "/leads": {
+      "post": {
+        "summary": "Registra una solicitud de presupuesto desde la landing page",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["fullName", "phone", "address", "locality", "customerType", "services", "privacyAccepted"],
+                "properties": {
+                  "fullName": { "type": "string", "example": "Carlos Benítez" },
+                  "phone": { "type": "string", "example": "+54 9 11 4455-6677" },
+                  "email": { "type": "string", "example": "carlos@ejemplo.com" },
+                  "address": { "type": "string", "example": "Av. Colón 1500" },
+                  "locality": { "type": "string", "example": "Córdoba" },
+                  "customerType": { "type": "string", "enum": ["HOGAR", "LOCAL_COMERCIAL", "OFICINA", "HOTEL_ALOJAMIENTO", "EMPRESA_RURAL", "OTRO"] },
+                  "services": { "type": "array", "items": { "type": "string" }, "example": ["CAMARAS_CABLEADAS", "STARLINK"] },
+                  "privacyAccepted": { "type": "boolean", "example": true }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Lead registrado exitosamente" },
+          "400": { "description": "Error de validación" },
+          "429": { "description": "Límite de solicitudes alcanzado" }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Inicio de sesión para usuarios administrativos",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "example": "admin@serviciostecnologicos.com" },
+                  "password": { "type": "string", "example": "CambiarPasswordSegura123!" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Sesión iniciada correctamente" },
+          "401": { "description": "Credenciales inválidas" }
+        }
+      }
+    },
+    "/admin/leads": {
+      "get": {
+        "summary": "Listado filtrado y paginado de leads",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Lista de leads" },
+          "401": { "description": "No autorizado" }
+        }
+      }
+    },
+    "/admin/dashboard": {
+      "get": {
+        "summary": "Métricas consolidadas de rendimiento comercial",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Estadísticas del dashboard" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
