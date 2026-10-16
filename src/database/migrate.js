@@ -12,9 +12,11 @@ export const getMigrator = (seq = sequelize) => {
     throw new Error('No hay conexión de base de datos activa configurada.');
   }
 
+  const migrationsPath = path.join(__dirname, 'migrations', '*.js').replace(/\\/g, '/');
+
   return new Umzug({
     migrations: {
-      glob: path.join(__dirname, 'migrations', '*.js'),
+      glob: migrationsPath,
       resolve: ({ name, path: filepath }) => {
         return {
           name,

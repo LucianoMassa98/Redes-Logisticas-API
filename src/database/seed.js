@@ -12,9 +12,11 @@ export const getSeeder = (seq = sequelize) => {
     throw new Error('No hay conexión de base de datos activa configurada.');
   }
 
+  const seedersPath = path.join(__dirname, 'seeders', '*.js').replace(/\\/g, '/');
+
   return new Umzug({
     migrations: {
-      glob: path.join(__dirname, 'seeders', '*.js'),
+      glob: seedersPath,
       resolve: ({ name, path: filepath }) => {
         return {
           name,
