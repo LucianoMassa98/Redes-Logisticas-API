@@ -102,7 +102,7 @@ export class InventoryRepository {
   }
 
   async getSummaryMetrics() {
-    const [totalItems, lowStockItems, totalVal] = await Promise.all([
+    const [totalItems, lowStockItems, totalUnits, totalVal] = await Promise.all([
       InventoryItem.count({ where: { isActive: true } }),
       InventoryItem.count({
         where: {
@@ -110,6 +110,7 @@ export class InventoryRepository {
           [Op.and]: literal('stock_quantity <= min_stock_alert'),
         },
       }),
+      InventoryItem.sum('stockQuantity', { where: { isActive: true } }),
       InventoryItem.findAll({
         attributes: [
           [fn('SUM', literal('cost_price * stock_quantity')), 'totalValue'],
@@ -119,10 +120,14 @@ export class InventoryRepository {
       }),
     ]);
 
+    const totalCostValue = parseFloat(totalVal[0]?.totalValue || 0);
+
     return {
       totalItems,
       lowStockItems,
-      totalInventoryCostValue: parseFloat(totalVal[0]?.totalValue || 0),
+      totalUnits: totalUnits || 0,
+      totalCostValue,
+      totalInventoryCostValue: totalCostValue,
     };
   }
 }
