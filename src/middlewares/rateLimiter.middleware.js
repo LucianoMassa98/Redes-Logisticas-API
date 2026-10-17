@@ -4,7 +4,14 @@ import { config } from '../config/env.js';
 
 export const generalLimiter = rateLimit({
   windowMs: config.rateLimit.windowMs,
-  max: config.rateLimit.max,
+  max: config.isProduction ? config.rateLimit.max : 10000,
+  skip: (req) => {
+    // En desarrollo o pruebas, no limitar las solicitudes locales
+    if (!config.isProduction) return true;
+    // Omitir para solicitudes autenticadas de administración
+    if (req.headers.authorization && req.path.includes('/admin/')) return true;
+    return false;
+  },
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res, next) => {
@@ -14,7 +21,8 @@ export const generalLimiter = rateLimit({
 
 export const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: config.rateLimit.authMax,
+  max: config.isProduction ? config.rateLimit.authMax : 100,
+  skip: () => !config.isProduction,
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res, next) => {
@@ -24,7 +32,8 @@ export const authLimiter = rateLimit({
 
 export const leadSubmissionLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20, // 20 envíos por cada 15 minutos por IP
+  max: config.isProduction ? 20 : 500,
+  skip: () => !config.isProduction,
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res, next) => {

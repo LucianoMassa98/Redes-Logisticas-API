@@ -30,8 +30,8 @@ const envSchema = Joi.object({
   INSTALLATION_MARKUP_PERCENT: Joi.number().min(0).default(100),
 
   RATE_LIMIT_WINDOW_MS: Joi.number().integer().default(15 * 60 * 1000),
-  RATE_LIMIT_MAX_REQUESTS: Joi.number().integer().default(100),
-  AUTH_RATE_LIMIT_MAX_REQUESTS: Joi.number().integer().default(10),
+  RATE_LIMIT_MAX_REQUESTS: Joi.number().integer().default(1500),
+  AUTH_RATE_LIMIT_MAX_REQUESTS: Joi.number().integer().default(50),
 }).unknown(true);
 
 const { error, value: envVars } = envSchema.validate(process.env, { abortEarly: false });
