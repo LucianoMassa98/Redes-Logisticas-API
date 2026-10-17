@@ -51,12 +51,8 @@ export const calculatePriceSchema = Joi.object({
         quantity: Joi.number().min(0.01).required(),
       })
     )
-    .min(1)
-    .required()
-    .messages({
-      'array.min': 'Debe incluir al menos un artículo para el cálculo.',
-      'any.required': 'La lista de artículos es obligatoria.',
-    }),
+    .default([]),
   laborCost: Joi.number().min(0).default(0),
   customMarkupPercent: Joi.number().min(0).allow(null).optional(),
 });
+

@@ -51,14 +51,16 @@ describe('Pruebas de Inventario y Calculador Automático de Precios', () => {
       assert.strictEqual(value.customMarkupPercent, 100);
     });
 
-    it('debe rechazar lista de artículos vacía', () => {
+    it('debe permitir lista de artículos vacía para cotizaciones solo de mano de obra', () => {
       const payload = {
         items: [],
         laborCost: 10000,
       };
 
-      const { error } = calculatePriceSchema.validate(payload);
-      assert.ok(error);
+      const { error, value } = calculatePriceSchema.validate(payload);
+      assert.strictEqual(error, undefined);
+      assert.strictEqual(value.laborCost, 10000);
+      assert.strictEqual(value.items.length, 0);
     });
   });
 
