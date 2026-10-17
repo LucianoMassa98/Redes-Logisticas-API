@@ -153,11 +153,11 @@ export class InventoryService {
     });
 
     const parsedLaborCost = Number(laborCost) || 0;
-    const laborSalePrice = Math.round(parsedLaborCost * (1 + globalMarkup / 100));
-    const laborProfit = laborSalePrice - parsedLaborCost;
+    const totalLaborSalePrice = Math.round(parsedLaborCost * (1 + globalMarkup / 100));
+    const laborProfit = totalLaborSalePrice - parsedLaborCost;
 
     const totalBaseCost = totalMaterialCost + parsedLaborCost;
-    const totalFinalSalePrice = totalMaterialSalePrice + laborSalePrice;
+    const totalFinalSalePrice = totalMaterialSalePrice + totalLaborSalePrice;
     const totalGrossProfit = totalFinalSalePrice - totalBaseCost;
     const effectiveTotalMarkupPercent = totalBaseCost > 0
       ? Math.round(((totalFinalSalePrice - totalBaseCost) / totalBaseCost) * 100)

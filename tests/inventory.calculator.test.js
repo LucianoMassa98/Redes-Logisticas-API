@@ -86,5 +86,13 @@ describe('Pruebas de Inventario y Calculador Automático de Precios', () => {
       assert.strictEqual(salePrice, 220000);
       assert.strictEqual(salePrice - totalCost, 120000);
     });
+
+    it('debe calcular la mano de obra con totalLaborSalePrice definido', () => {
+      const parsedLaborCost = 45000;
+      const globalMarkup = 100;
+      const totalLaborSalePrice = Math.round(parsedLaborCost * (1 + globalMarkup / 100));
+      assert.strictEqual(totalLaborSalePrice, 90000);
+      assert.strictEqual(typeof totalLaborSalePrice, 'number');
+    });
   });
 });
