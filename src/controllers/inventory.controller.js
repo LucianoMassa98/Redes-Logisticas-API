@@ -63,3 +63,13 @@ export const getConfig = async (req, res, next) => {
     next(error);
   }
 };
+
+export const deleteItem = async (req, res, next) => {
+  try {
+    const result = await inventoryService.deleteItem(req.params.id);
+    return sendSuccess(res, result, 'Artículo eliminado exitosamente');
+  } catch (error) {
+    next(error);
+  }
+};
+

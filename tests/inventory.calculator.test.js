@@ -97,4 +97,19 @@ describe('Pruebas de Inventario y Calculador Automático de Precios', () => {
       assert.strictEqual(typeof totalLaborSalePrice, 'number');
     });
   });
+
+  describe('Eliminación de Artículos de Inventario', () => {
+    it('debe rechazar eliminar un artículo inexistente con 404', async () => {
+      const { inventoryService } = await import('../src/services/inventory.service.js');
+      await assert.rejects(
+        () => inventoryService.deleteItem('00000000-0000-0000-0000-000000000000'),
+        (err) => {
+          assert.strictEqual(err.isBoom, true);
+          assert.strictEqual(err.output.statusCode, 404);
+          return true;
+        }
+      );
+    });
+  });
 });
+

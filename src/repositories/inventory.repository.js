@@ -88,6 +88,11 @@ export class InventoryRepository {
     return item;
   }
 
+  async delete(id) {
+    const rowsDeleted = await InventoryItem.destroy({ where: { id } });
+    return rowsDeleted > 0;
+  }
+
   async getCategories() {
     const categories = await InventoryItem.findAll({
       attributes: [[fn('DISTINCT', col('category')), 'category']],

@@ -100,6 +100,16 @@ export class InventoryService {
     return this.getItemById(id);
   }
 
+  async deleteItem(id) {
+    const item = await inventoryRepository.findById(id);
+    if (!item) {
+      throw Boom.notFound('El artículo no existe en el inventario.');
+    }
+
+    await inventoryRepository.delete(id);
+    return { success: true, message: `Artículo "${item.name}" eliminado correctamente.` };
+  }
+
   /**
    * Calculador automático de cotizaciones e instalaciones:
    * Aplica costo + margen configurado (Costo + 100% por defecto desde .env)

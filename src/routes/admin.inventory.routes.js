@@ -7,6 +7,7 @@ import {
   adjustStock,
   calculateQuotePrice,
   getConfig,
+  deleteItem,
 } from '../controllers/inventory.controller.js';
 import { requireAuth } from '../middlewares/auth.middleware.js';
 import { requireRoles } from '../middlewares/role.middleware.js';
@@ -45,5 +46,8 @@ router.patch('/inventory/:id', validateRequest(uuidParamSchema, 'params'), valid
 
 // Ajuste rápido de stock (+ / - / set)
 router.patch('/inventory/:id/stock', validateRequest(uuidParamSchema, 'params'), validateRequest(adjustStockSchema, 'body'), adjustStock);
+
+// Eliminación de artículos del inventario
+router.delete('/inventory/:id', validateRequest(uuidParamSchema, 'params'), deleteItem);
 
 export default router;
