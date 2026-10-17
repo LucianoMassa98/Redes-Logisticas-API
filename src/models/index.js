@@ -7,10 +7,11 @@ import { LeadNote } from './LeadNote.js';
 import { LeadActivity } from './LeadActivity.js';
 import { Quote } from './Quote.js';
 import { InventoryItem } from './InventoryItem.js';
+import { InstallationPreset } from './InstallationPreset.js';
 
 export const initModels = (seqInstance = sequelize) => {
   if (!seqInstance) {
-    return { Service, User, Lead, LeadService, LeadNote, LeadActivity, Quote, InventoryItem, sequelize: null };
+    return { Service, User, Lead, LeadService, LeadNote, LeadActivity, Quote, InventoryItem, InstallationPreset, sequelize: null };
   }
 
   // Inicializar modelos
@@ -22,6 +23,7 @@ export const initModels = (seqInstance = sequelize) => {
   LeadActivity.initModel(seqInstance);
   Quote.initModel(seqInstance);
   InventoryItem.initModel(seqInstance);
+  InstallationPreset.initModel(seqInstance);
 
   // Relaciones Lead <-> Service (Muchos a Muchos)
   Lead.belongsToMany(Service, {
@@ -109,10 +111,11 @@ export const initModels = (seqInstance = sequelize) => {
     LeadActivity,
     Quote,
     InventoryItem,
+    InstallationPreset,
     sequelize: seqInstance,
   };
 };
 
 // Inicialización automática si sequelize está disponible
 export const models = initModels();
-export { Service, User, Lead, LeadService, LeadNote, LeadActivity, Quote, InventoryItem, sequelize };
+export { Service, User, Lead, LeadService, LeadNote, LeadActivity, Quote, InventoryItem, InstallationPreset, sequelize };
