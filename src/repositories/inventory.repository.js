@@ -102,7 +102,7 @@ export class InventoryRepository {
   }
 
   async getSummaryMetrics() {
-    const [totalItems, lowStockItems, totalUnits, totalVal] = await Promise.all([
+    const [totalItems, lowStockItems, totalUnits, totalVal, minStockVal] = await Promise.all([
       InventoryItem.count({ where: { isActive: true } }),
       InventoryItem.count({
         where: {
@@ -118,9 +118,37 @@ export class InventoryRepository {
         where: { isActive: true },
         raw: true,
       }),
+      InventoryItem.findAll({
+        attributes: [
+          [fn('SUM', literal('cost_price * min_stock_alert')), 'totalMinStockCost'],
+          [
+            fn(
+              'SUM',
+              literal(
+                'CASE WHEN stock_quantity < min_stock_alert THEN (min_stock_alert - stock_quantity) * cost_price ELSE 0 END'
+              )
+            ),
+            'totalReplenishCost',
+          ],
+          [
+            fn(
+              'SUM',
+              literal(
+                'CASE WHEN stock_quantity < min_stock_alert THEN (min_stock_alert - stock_quantity) ELSE 0 END'
+              )
+            ),
+            'totalReplenishUnits',
+          ],
+        ],
+        where: { isActive: true },
+        raw: true,
+      }),
     ]);
 
     const totalCostValue = parseFloat(totalVal[0]?.totalValue || 0);
+    const totalMinStockCost = parseFloat(minStockVal[0]?.totalMinStockCost || 0);
+    const totalReplenishCost = parseFloat(minStockVal[0]?.totalReplenishCost || 0);
+    const totalReplenishUnits = parseInt(minStockVal[0]?.totalReplenishUnits || 0, 10);
 
     return {
       totalItems,
@@ -128,6 +156,9 @@ export class InventoryRepository {
       totalUnits: totalUnits || 0,
       totalCostValue,
       totalInventoryCostValue: totalCostValue,
+      totalMinStockCost,
+      totalReplenishCost,
+      totalReplenishUnits,
     };
   }
 }

@@ -18,11 +18,18 @@ export class InventoryService {
       const unitCost = Number(item.costPrice);
       const calculatedSalePrice = Math.round(unitCost * (1 + markup / 100));
 
+      const unitsNeeded = Math.max(0, Number(item.minStockAlert || 0) - Number(item.stockQuantity || 0));
+      const replenishCost = unitsNeeded * unitCost;
+      const minStockTotalCost = Number(item.minStockAlert || 0) * unitCost;
+
       return {
         ...itemJson,
         effectiveMarkupPercent: markup,
         calculatedSalePrice,
         isLowStock: item.stockQuantity <= item.minStockAlert,
+        unitsNeeded,
+        replenishCost,
+        minStockTotalCost,
       };
     });
 
